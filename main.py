@@ -6,7 +6,7 @@ import openai
 # Настройте бота и учетные данные OpenAI API
 bot_token = 'TOKEN'
 api_key = 'TOKEN'
-user_ids= 'telegram_id1, telegram_id2'
+user_ids= [telegram_id1, telegram_id2]
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,7 +29,7 @@ async def generate_image(prompt):
     return response['data'][0]['url']
 
 
-@dp.message_handler(commands=['start'], user_id=[user_ids])
+@dp.message_handler(commands=['start'], user_id=user_ids)
 async def start_cmd(message: types.Message):
     try:
         username = message.from_user.username
@@ -39,7 +39,7 @@ async def start_cmd(message: types.Message):
         logging.error(f'Error in start_cmd: {e}')
 
 
-@dp.message_handler(commands=['newtopic'], user_id=[user_ids])
+@dp.message_handler(commands=['newtopic'], user_id=user_ids)
 async def new_topic_cmd(message: types.Message):
     try:
         userid = message.from_user.id
@@ -49,7 +49,7 @@ async def new_topic_cmd(message: types.Message):
         logging.error(f'Error in new_topic_cmd: {e}')
 
 
-@dp.message_handler(commands=['image'], user_id=[user_ids])
+@dp.message_handler(commands=['image'], user_id=user_ids)
 async def send_image(message: types.Message):
     try:
         description = message.text.replace('/image', '').strip()
@@ -66,7 +66,7 @@ async def send_image(message: types.Message):
             f"* * * \n\nПроизошла ошибка при генерации изображения: {e} * * *")
 
 
-@dp.message_handler(user_id=[user_ids])
+@dp.message_handler(user_id=user_ids)
 async def echo_msg(message: types.Message):
     try:
         user_message = message.text
