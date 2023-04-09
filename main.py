@@ -3,9 +3,10 @@ import time
 from aiogram import Bot, Dispatcher, executor, types
 import openai
 
-# Set up the bot and OpenAI API credentials
+# Настройте бота и учетные данные OpenAI API
 bot_token = 'TOKEN'
 api_key = 'TOKEN'
+user_ids= 'telegram_id1, telegram_id2'
 
 logging.basicConfig(level=logging.INFO)
 
@@ -28,32 +29,32 @@ async def generate_image(prompt):
     return response['data'][0]['url']
 
 
-@dp.message_handler(commands=['start'])
+@dp.message_handler(commands=['start'], user_id=[user_ids])
 async def start_cmd(message: types.Message):
     try:
         username = message.from_user.username
         messages[username] = []
-        await message.answer("Hello, I'm bot powered on API GPT-4(ChatGPT)")
+        await message.answer("Привет, я бот GPT-3.5-turbo(ChatGPT)")
     except Exception as e:
         logging.error(f'Error in start_cmd: {e}')
 
 
-@dp.message_handler(commands=['newtopic'])
+@dp.message_handler(commands=['newtopic'], user_id=[user_ids])
 async def new_topic_cmd(message: types.Message):
     try:
         userid = message.from_user.id
         messages[str(userid)] = []
-        await message.reply('Starting a new topic! * * * \n\nНачинаем новую тему! * * *', parse_mode='Markdown')
+        await message.reply('* * * \n\nНачинаем новую тему! * * *', parse_mode='Markdown')
     except Exception as e:
         logging.error(f'Error in new_topic_cmd: {e}')
 
 
-@dp.message_handler(commands=['image'])
+@dp.message_handler(commands=['image'], user_id=[user_ids])
 async def send_image(message: types.Message):
     try:
         description = message.text.replace('/image', '').strip()
         if not description:
-            await message.reply('Please add a description of the image after the /image command. For example, /image Neon City * * * \n\nПожалуйста, добавьте описание изображения после команды /image. Например, /image Неоновый город. * * *',parse_mode='Markdown')
+            await message.reply(' * * * \n\nПожалуйста, добавьте описание изображения после команды /image. Например, /image Неоновый город. * * *',parse_mode='Markdown')
             return
     except Exception as e:
         logging.error(f'Error in send_image: {e}')
@@ -62,10 +63,10 @@ async def send_image(message: types.Message):
         await bot.send_photo(chat_id=message.chat.id, photo=image_url)
     except Exception as e:
         await message.reply(
-            f"An error occurred during image generation: * * * \n\nПроизошла ошибка при генерации изображения: {e} * * *")
+            f"* * * \n\nПроизошла ошибка при генерации изображения: {e} * * *")
 
 
-@dp.message_handler()
+@dp.message_handler(user_id=[user_ids])
 async def echo_msg(message: types.Message):
     try:
         user_message = message.text
@@ -86,7 +87,7 @@ async def echo_msg(message: types.Message):
         if should_respond:
             # Send a "processing" message to indicate that the bot is working
             processing_message = await message.reply(
-                'Your request is being processed, please wait \n\n(If the bot does not respond, write /newtopic, openai killed my feature on auto-cleaning the topic when the token overflow) * * * \n\nВаш запрос обрабатывается, пожалуйста подождите \n\n(Если бот не отвечает, напишите /newtopic, openai убили мою функцию по автоочистке темы при переполнении токенов) * * *',
+                '* * * \n\nВаш запрос обрабатывается, пожалуйста подождите \n\n(Если бот не отвечает 30 сек, напишите /start ) * * *',
                 parse_mode='Markdown')
 
             # Send a "typing" action to indicate that the bot is typing a response
@@ -94,7 +95,7 @@ async def echo_msg(message: types.Message):
 
             # Generate a response using OpenAI's Chat API
             completion = await openai.ChatCompletion.acreate(
-                model="gpt-4",
+                model="gpt-3.5-turbo",
                 messages=messages[userid],
                 max_tokens=2500,
                 temperature=0.7,
@@ -118,7 +119,7 @@ async def echo_msg(message: types.Message):
         # If an error occurs, try starting a new topic
         if ex == "context_length_exceeded":
             await message.reply(
-                'The bot ran out of memory, re-creating the dialogue * * * \n\nУ бота закончилась память, пересоздаю диалог * * *',
+                '* * * \n\nУ бота закончилась память, пересоздаю диалог * * *',
                 parse_mode='Markdown')
             await new_topic_cmd(message)
             await echo_msg(message)
