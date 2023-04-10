@@ -6,6 +6,7 @@ import openai
 # Настройте бота и учетные данные OpenAI API
 bot_token = 'TOKEN'
 api_key = 'TOKEN'
+# Если нужно ограничить круг пользователей бота, уберите решётку в следующей строке и впишите id
 #user_ids= [telegram_id1, telegram_id2]
 
 logging.basicConfig(level=logging.INFO)
