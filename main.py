@@ -87,7 +87,7 @@ async def echo_msg(message: types.Message):
         if should_respond:
             # Send a "processing" message to indicate that the bot is working
             processing_message = await message.reply(
-                '* * * \n\nВаш запрос обрабатывается, пожалуйста подождите \n\n(Если бот не отвечает 30 сек, напишите /start ) * * *',
+                '* * * \n\nВаш запрос обрабатывается, пожалуйста подождите... * * *',
                 parse_mode='Markdown')
 
             # Send a "typing" action to indicate that the bot is typing a response
@@ -116,14 +116,11 @@ async def echo_msg(message: types.Message):
             await bot.delete_message(chat_id=processing_message.chat.id, message_id=processing_message.message_id)
 
     except Exception as ex:
-        # If an error occurs, try starting a new topic
-        if ex == "context_length_exceeded":
-            await message.reply(
-                '* * * \n\nУ бота закончилась память, пересоздаю диалог * * *',
-                parse_mode='Markdown')
-            await new_topic_cmd(message)
-            await echo_msg(message)
-
+        await message.reply(f"* * * \n\nERROR: \n{ex} * * *", parse_mode='Markdown')
+        # Delete the "processing" message
+        await bot.delete_message(chat_id=processing_message.chat.id, message_id=processing_message.message_id)
+        await message.reply('* * * \n\nНачинаем новый диалог! * * *', parse_mode='Markdown')
+        await start_cmd(message)
 
 if __name__ == '__main__':
     executor.start_polling(dp)
