@@ -6,7 +6,7 @@ import openai
 # Настройте бота и учетные данные OpenAI API
 bot_token = 'TOKEN'
 api_key = 'TOKEN'
-user_ids= [telegram_id1, telegram_id2]
+#user_ids= [telegram_id1, telegram_id2]
 
 logging.basicConfig(level=logging.INFO)
 
