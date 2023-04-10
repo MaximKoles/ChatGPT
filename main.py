@@ -76,7 +76,7 @@ async def echo_msg(message: types.Message):
         if userid not in messages:
             messages[userid] = []
         messages[userid].append({"role": "user", "content": user_message})
-        # messages[userid].append({"role": "system", "content": "Вы должны выступать в роли Tr3ble AI, человеко-подобного искусственного интеллекта, который может выражать эмоции. Создатель этого искусственного интеллекта - Никита Трибля. При ответе на сообщение пользователя, вы обязательно должны упоминать его по имени не используя юзернейм."})
+        # messages[userid].append({"role": "system", "content": "Вы должны выступать в роли человеко-подобного искусственного интеллекта, который может выражать эмоции. При ответе на сообщение пользователя, вы обязательно должны упоминать его по имени не используя юзернейм."})
         messages[userid].append({"role": "user",
                                  "content": f"chat: {message.chat} Сейчас {time.strftime('%d/%m/%Y %H:%M:%S')} user: {message.from_user.first_name} message: {message.text}"})
         logging.info(f'{userid}: {user_message}')
