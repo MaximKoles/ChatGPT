@@ -2,12 +2,13 @@ import logging
 import time
 from aiogram import Bot, Dispatcher, executor, types
 import openai
+import asyncio
 
 # Настройте бота и учетные данные OpenAI API
 bot_token = 'TOKEN'
 api_key = 'TOKEN'
 # Если нужно ограничить круг пользователей бота, уберите решётку в следующей строке и впишите id
-#user_ids= [telegram_id1, telegram_id2]
+user_ids= [535573537, 539476482]
 
 logging.basicConfig(level=logging.INFO)
 
@@ -77,7 +78,6 @@ async def echo_msg(message: types.Message):
         if userid not in messages:
             messages[userid] = []
         messages[userid].append({"role": "user", "content": user_message})
-        # messages[userid].append({"role": "system", "content": "Вы должны выступать в роли человеко-подобного искусственного интеллекта, который может выражать эмоции. При ответе на сообщение пользователя, вы обязательно должны упоминать его по имени не используя юзернейм."})
         messages[userid].append({"role": "user",
                                  "content": f"chat: {message.chat} Сейчас {time.strftime('%d/%m/%Y %H:%M:%S')} user: {message.from_user.first_name} message: {message.text}"})
         logging.info(f'{userid}: {user_message}')
@@ -92,10 +92,10 @@ async def echo_msg(message: types.Message):
                 parse_mode='Markdown')
 
             # Send a "typing" action to indicate that the bot is typing a response
-            await bot.send_chat_action(chat_id=message.chat.id, action="typing")
+            typing_task = asyncio.create_task(bot.send_chat_action(chat_id=message.chat.id, action="typing"))
 
-            # Generate a response using OpenAI's Chat API
-            completion = await openai.ChatCompletion.acreate(
+            # Generate a response using OpenAI's Chat API in the background
+            response_task = asyncio.create_task(openai.ChatCompletion.acreate(
                 model="gpt-3.5-turbo",
                 messages=messages[userid],
                 max_tokens=2500,
@@ -103,15 +103,20 @@ async def echo_msg(message: types.Message):
                 frequency_penalty=0,
                 presence_penalty=0,
                 user=userid
-            )
-            chatgpt_response = completion.choices[0]['message']
+            ))
+
+            # Wait for both tasks to complete
+            done, pending = await asyncio.wait([typing_task, response_task], return_when=asyncio.ALL_COMPLETED)
+
+            # Get the response from the completed task
+            chatgpt_response = response_task.result().choices[0]['message']
 
             # Add the bot's response to the user's message history
             messages[userid].append({"role": "assistant", "content": chatgpt_response['content']})
             logging.info(f'ChatGPT response: {chatgpt_response["content"]}')
 
             # Send the bot's response to the user
-            await message.reply(chatgpt_response['content'])
+            await bot.send_message(chat_id=message.chat.id, text=chatgpt_response['content'])
 
             # Delete the "processing" message
             await bot.delete_message(chat_id=processing_message.chat.id, message_id=processing_message.message_id)
