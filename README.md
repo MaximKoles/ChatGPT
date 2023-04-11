@@ -3,7 +3,6 @@ ChatGPT - это бот для Telegram, который использует я�
 
 # Bot
 The bot online (GPT3.5)
-<h3 align="left">Telegram:</h3> <a href="https://t.me/ChatGPTtesting_robot"><img src="https://img.shields.io/website?color=9400d3&down_message=Tr3ble_AI&label=Telegram&logo=telegram&style=for-the-badge&up_message=ChatGPTtesting_robot&url=https%3A%2F%2Ft.me%2https://t.me/ChatGPTtesting_robot"></a>
 
 # Установка
 Чтобы использовать бота ChatGPT, вам необходимо иметь учетную запись Telegram и ключ API OpenAI. API-ключ можно получить, подписавшись на программу OpenAI GPT-3.5.
